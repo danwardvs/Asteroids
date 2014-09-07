@@ -17,6 +17,8 @@ int point_y=300;
 float angle_x;
 float angle_y;
 
+bool debugmode;
+
 bool create_bullet;
 int bullet_delay;
 
@@ -75,12 +77,17 @@ void update(){
     if(key[KEY_DOWN] || key[KEY_S])point_y++;
 
     //Draws the screen
-    rectfill(buffer,0,0,800,600,makecol(255,255,250));
-    textprintf_ex(buffer,font,5,5,makecol(0,0,0),-1,"Mouse X:%i",mouse_x);
-    textprintf_ex(buffer,font,5,15,makecol(0,0,0),-1,"Mouse Y:%i",mouse_y);
-    textprintf_ex(buffer,font,5,25,makecol(0,0,0),-1,"Distance to mouse:%4.2f",distance_to_mouse);
-    textprintf_ex(buffer,font,5,35,makecol(0,0,0),-1,"Radians:%4.2f,Degrees%4.2f,Allegro%4.2f",angle_radians,angle_degrees,angle_allegro);
-    textprintf_ex(buffer,font,5,45,makecol(0,0,0),-1,"Vector X:%4.2f,Vector Y:%4.2f",angle_x,angle_y);
+    rectfill(buffer,0,0,800,600,makecol(10,0,0));
+    if(key[KEY_F1])debugmode=true;
+    if(key[KEY_F2])debugmode=false;
+    if(debugmode){
+        textprintf_ex(buffer,font,5,5,makecol(0,0,0),-1,"Mouse X:%i",mouse_x);
+        textprintf_ex(buffer,font,5,15,makecol(0,0,0),-1,"Mouse Y:%i",mouse_y);
+        textprintf_ex(buffer,font,5,25,makecol(0,0,0),-1,"Distance to mouse:%4.2f",distance_to_mouse);
+        textprintf_ex(buffer,font,5,35,makecol(0,0,0),-1,"Radians:%4.2f,Degrees%4.2f,Allegro%4.2f",angle_radians,angle_degrees,angle_allegro);
+        textprintf_ex(buffer,font,5,45,makecol(0,0,0),-1,"Vector X:%4.2f,Vector Y:%4.2f",angle_x,angle_y);
+    }
+
     rotate_sprite(buffer,pointer,point_x-30,point_y-30,itofix(angle_allegro));
     putpixel(buffer,point_x,point_y,makecol(0,0,0));
     for(int i=0; i<100; i++){
@@ -88,7 +95,7 @@ void update(){
             putpixel(buffer,bullets[i].x,bullets[i].y,makecol(255,0,0));
         }
     }
-    draw_sprite(buffer,cursor,mouse_x,mouse_y);
+    draw_sprite(buffer,cursor,mouse_x-10,mouse_y-10);
     draw_sprite(screen,buffer,0,0);
 
     bullet_delay++;
