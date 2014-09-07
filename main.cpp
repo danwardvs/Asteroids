@@ -4,7 +4,7 @@
 
 BITMAP* buffer;
 BITMAP* cursor;
-BITMAP* pointer;
+BITMAP* spaceship;
 
 float distance_to_mouse;
 float angle_radians;
@@ -88,7 +88,7 @@ void update(){
         textprintf_ex(buffer,font,5,45,makecol(0,0,0),-1,"Vector X:%4.2f,Vector Y:%4.2f",angle_x,angle_y);
     }
 
-    rotate_sprite(buffer,pointer,point_x-30,point_y-30,itofix(angle_allegro));
+    rotate_sprite(buffer,spaceship,point_x-30,point_y-30,itofix(angle_allegro));
     putpixel(buffer,point_x,point_y,makecol(0,0,0));
     for(int i=0; i<100; i++){
         if(bullets[i].on_screen){
@@ -136,8 +136,8 @@ void setup(){
     if(!(cursor = load_bitmap("cursor.png",NULL))){
         abort_on_error( "Cannot find cursor.png.\n Please check your files and try again.");
     }
-    if(!(pointer = load_bitmap("pointer.png",NULL))){
-        abort_on_error( "Cannot find pointer.png.\n Please check your files and try again.");
+    if(!(spaceship = load_bitmap("spaceship.png",NULL))){
+        abort_on_error( "Cannot find spaceship.png.\n Please check your files and try again.");
     }
 }
 
