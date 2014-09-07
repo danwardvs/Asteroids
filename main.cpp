@@ -11,11 +11,13 @@ float angle_radians;
 float angle_degrees;
 float angle_allegro;
 
-int point_x=400;
-int point_y=300;
+int player_x=400;
+int player_y=300;
 
 float angle_x;
 float angle_y;
+float vector_x;
+float vector_y;
 
 bool debugmode;
 
@@ -60,8 +62,8 @@ float find_angle(int x_1, int y_1, int x_2, int y_2){
 void update(){
 
     //Calls the function, solves the math
-    distance_to_mouse=distance_to_object(mouse_x,mouse_y,point_x,point_y);
-    angle_radians=find_angle(point_x,point_y,mouse_x,mouse_y);
+    distance_to_mouse=distance_to_object(mouse_x,mouse_y,player_x,player_y);
+    angle_radians=find_angle(player_x,player_y,mouse_x,mouse_y);
 
     //Converts radians to usable(by allegro) values
     angle_degrees=(angle_radians*57.2957795);
@@ -71,10 +73,7 @@ void update(){
     angle_y=cos(angle_degrees);
 
     //Moves the point
-    if(key[KEY_LEFT] || key[KEY_A])point_x--;
-    if(key[KEY_RIGHT] || key[KEY_D])point_x++;
-    if(key[KEY_UP] || key[KEY_W])point_y--;
-    if(key[KEY_DOWN] || key[KEY_S])point_y++;
+
 
     //Draws the screen
     rectfill(buffer,0,0,800,600,makecol(10,0,0));
@@ -88,8 +87,8 @@ void update(){
         textprintf_ex(buffer,font,5,45,makecol(0,0,0),-1,"Vector X:%4.2f,Vector Y:%4.2f",angle_x,angle_y);
     }
 
-    rotate_sprite(buffer,spaceship,point_x-30,point_y-30,itofix(angle_allegro));
-    putpixel(buffer,point_x,point_y,makecol(0,0,0));
+    rotate_sprite(buffer,spaceship,player_x-46,player_y-38,itofix(angle_allegro));
+    putpixel(buffer,player_x,player_y,makecol(0,0,0));
     for(int i=0; i<100; i++){
         if(bullets[i].on_screen){
             putpixel(buffer,bullets[i].x,bullets[i].y,makecol(255,0,0));
@@ -104,6 +103,16 @@ void update(){
         bullet_delay=0;
     }
 
+
+
+    vector_y=-2*sin(angle_radians);
+    vector_x=-2*cos(angle_radians);
+    if(key[KEY_LEFT] || key[KEY_W]){
+        player_x+=vector_x;
+        player_y+=vector_y;
+    }
+
+
     for(int i=0; i<100; i++){
         if(bullets[i].on_screen){
            bullets[i].x+=bullets[i].vector_x;
@@ -114,8 +123,8 @@ void update(){
         }else if(create_bullet==true){
             bullets[i].on_screen=true;
             create_bullet=false;
-            bullets[i].x=point_x;
-            bullets[i].y=point_y;
+            bullets[i].x=player_x;
+            bullets[i].y=player_y;
             bullets[i].vector_x=-2*cos(angle_radians);
             bullets[i].vector_y=-2*sin(angle_radians);
         }
