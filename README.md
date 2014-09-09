@@ -1,13 +1,13 @@
-Mouse-Math
+Asteroids
 ==========
 
-A simple little program that displays the distance to mouse and the angle of the mouse.
+An asteroid-esque game with a click and shoot laser cannon.
 
-Compiled with allegro 4.4, alpng, and math.h
+Compiled with allegro 4.4, alpng, cmath, and time.h
 
 Controls
 ===========
 
-Arrow keys to move point around.
+Point and click at the asteroids with the mouse
 
 
