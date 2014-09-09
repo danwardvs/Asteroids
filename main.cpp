@@ -5,6 +5,7 @@
 BITMAP* buffer;
 BITMAP* cursor;
 BITMAP* spaceship;
+BITMAP* gun;
 
 float distance_to_mouse;
 float angle_radians;
@@ -87,8 +88,10 @@ void update(){
         textprintf_ex(buffer,font,5,45,makecol(0,0,0),-1,"Vector X:%4.2f,Vector Y:%4.2f",angle_x,angle_y);
     }
 
-    rotate_sprite(buffer,spaceship,player_x-46,player_y-38,itofix(angle_allegro));
-    putpixel(buffer,player_x,player_y,makecol(0,0,0));
+
+    draw_sprite(buffer,spaceship,player_x-23,player_y-19);
+    rotate_sprite(buffer,gun,player_x,player_y,itofix(angle_allegro));
+
     for(int i=0; i<100; i++){
         if(bullets[i].on_screen){
             putpixel(buffer,bullets[i].x,bullets[i].y,makecol(255,0,0));
@@ -105,12 +108,12 @@ void update(){
 
 
 
-    vector_y=-2*sin(angle_radians);
-    vector_x=-2*cos(angle_radians);
-    if(key[KEY_LEFT] || key[KEY_W]){
-        player_x+=vector_x;
-        player_y+=vector_y;
-    }
+    //vector_y=-2*sin(angle_radians);
+    //vector_x=-2*cos(angle_radians);
+    //if(key[KEY_LEFT] || key[KEY_W]){
+    //    player_x+=vector_x;
+    //    player_y+=vector_y;
+    //}
 
 
     for(int i=0; i<100; i++){
@@ -147,6 +150,9 @@ void setup(){
     }
     if(!(spaceship = load_bitmap("spaceship.png",NULL))){
         abort_on_error( "Cannot find spaceship.png.\n Please check your files and try again.");
+    }
+    if(!(gun = load_bitmap("gun.png",NULL))){
+        abort_on_error( "Cannot find gun.png.\n Please check your files and try again.");
     }
 }
 
