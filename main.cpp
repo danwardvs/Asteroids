@@ -370,7 +370,7 @@ int main(){
   install_sound(DIGI_AUTODETECT,MIDI_AUTODETECT,".");
 
 
-  set_window_title("Angle Finder");
+  set_window_title("Asteroids");
   setup();
 
 
