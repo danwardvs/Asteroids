@@ -15,6 +15,13 @@ BITMAP* asteroid_smaller;
 SAMPLE* fire;
 SAMPLE* asteroid_shot;
 
+FONT* maven_pro;
+FONT* f1;
+FONT* f2;
+FONT* f3;
+FONT* f4;
+FONT* f5;
+
 float distance_to_mouse;
 float angle_radians;
 float angle_degrees;
@@ -32,6 +39,8 @@ bool debugmode;
 
 bool create_bullet;
 int bullet_delay;
+
+int asteroid_killcount;
 
 struct particle{
     int x;
@@ -172,6 +181,7 @@ void draw(){
     }
 
     draw_sprite(buffer,cursor,mouse_x-10,mouse_y-10);
+    textprintf_ex(buffer,maven_pro,10,10,makecol(255,255,255),-1,"Asteroids killcount:%i",asteroid_killcount);
     draw_sprite(screen,buffer,0,0);
 
 
@@ -260,7 +270,10 @@ void update(){
 
                 if(hit){
                     asteroids[j].size--;
-                    if(asteroids[j].size<1)asteroids[j].on_screen=false;
+                    if(asteroids[j].size<1){
+                        asteroids[j].on_screen=false;
+                        asteroid_killcount++;
+                    }
                     bullets[i].on_screen=false;
                     play_sample(asteroid_shot,125,125,1000,0);
                     create_particles(asteroids[j].x+50,asteroids[j].y+50,10);
@@ -294,6 +307,17 @@ void update(){
 
 void setup(){
     buffer=create_bitmap(800,600);
+
+    if(!(f1 = load_font("maven_pro.pcx", NULL, NULL))){
+    abort_on_error( "Cannot find maven_pro.pcx \n Please check your files and try again");
+    }
+    f2 = extract_font_range(f1, ' ', 'A'-1);
+    f3 = extract_font_range(f1, 'A', 'Z');
+    f4 = extract_font_range(f1, 'Z'+1, 'z');
+
+    //Merge temporary fonts to create "pixelart"
+    maven_pro = merge_fonts(f4, f5 = merge_fonts(f2, f3));
+
 
     if(!(cursor = load_bitmap("cursor.png",NULL))){
         abort_on_error( "Cannot find cursor.png.\n Please check your files and try again.");

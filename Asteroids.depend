@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1410237741 source:c:\users\danward\documents\github\asteroids\main.cpp
+1410241038 source:c:\users\danward\documents\github\asteroids\main.cpp
 	<allegro.h>
 	<alpng.h>
 	<cmath>
