@@ -48,6 +48,7 @@ struct particle{
     int r;
     int g;
     int b;
+    int direction;
     bool on_screen;
 }particles[1000];
 
@@ -111,32 +112,56 @@ float find_angle(int x_1, int y_1, int x_2, int y_2){
 
     return atan2(tan_1,tan_2);
 }
-void create_particles(int x, int y, int amount){
+void create_particles(int x, int y, int amount,int colour,int direction){
     for(int i=0; i<amount;){
         for(int j=0; j<1000; j++){
-            if(!particles[j].on_screen){
+            if(!particles[j].on_screen && i<amount){
                 particles[j].on_screen=true;
                 particles[j].x=x;
                 particles[j].y=y;
+                particles[j].direction=direction;
                 int randnum=random(1,3);
                 if(randnum==1){
-                    particles[j].r=51;
-                    particles[j].g=51;
-                    particles[j].b=51;
+                    if(colour==1){
+                        particles[j].r=51;
+                        particles[j].g=51;
+                        particles[j].b=51;
+                    }else if(colour==2){
+                        particles[j].r=0;
+                        particles[j].g=0;
+                        particles[j].b=255;
+
+                    }
+
                 }else if(randnum==2){
-                    particles[j].r=145;
-                    particles[j].g=29;
-                    particles[j].b=29;
+                    if(colour==1){
+                        particles[j].r=145;
+                        particles[j].g=29;
+                        particles[j].b=29;
+                    }else if(colour==2){
+                        particles[j].r=255;
+                        particles[j].g=0;
+                        particles[j].b=0;
+
+                    }
                 }else if(randnum==2){
-                    particles[j].r=84;
-                    particles[j].g=16;
-                    particles[j].b=16;
+                    if(colour==1){
+                        particles[j].r=84;
+                        particles[j].g=16;
+                        particles[j].b=16;
+                    }else if(colour==2){
+                        particles[j].r=0;
+                        particles[j].g=255;
+                        particles[j].b=0;
+
+                    }
                 }
 
                 i++;
 
 
             }
+        if(j==999 && i<amount)i=amount;
         }
     }
 
@@ -170,7 +195,10 @@ void draw(){
     }
     for(int i=0; i<100; i++){
         if(bullets[i].on_screen){
-            putpixel(buffer,bullets[i].x,bullets[i].y,makecol(255,0,0));
+            putpixel(buffer,bullets[i].x+1,bullets[i].y,makecol(255,255,255));
+            putpixel(buffer,bullets[i].x+1,bullets[i].y+1,makecol(255,255,255));
+            putpixel(buffer,bullets[i].x,bullets[i].y+1,makecol(255,255,255));
+            putpixel(buffer,bullets[i].x,bullets[i].y,makecol(255,255,255));
         }
     }
     for(int i=0; i<1000; i++){
@@ -210,6 +238,8 @@ void update(){
         create_bullet=true;
         bullet_delay=0;
         play_sample(fire,125,125,1000,0);
+        for(int i=1; i<9; i++)create_particles(player_x,player_y,5,2,i);
+
     }
 
 
@@ -226,8 +256,21 @@ void update(){
     for(int i=0; i<1000; i++){
         if(particles[i].on_screen){
             if(particles[i].x>800 || particles[i].x<0 || particles[i].y>600 || particles[i].y<0)particles[i].on_screen=false;
-            particles[i].x+=random(-2,2);
-            particles[i].y+=random(-2,2);
+            if(particles[i].direction==0)particles[i].x+=random(-2,2);
+            if(particles[i].direction==0)particles[i].y+=random(-2,2);
+            if(particles[i].direction==1)particles[i].x+=random(0,2);
+            if(particles[i].direction==2)particles[i].x+=random(0,2);
+            if(particles[i].direction==2)particles[i].y+=random(0,2);
+            if(particles[i].direction==3)particles[i].y+=random(0,2);
+            if(particles[i].direction==4)particles[i].x+=random(-2,0);
+            if(particles[i].direction==4)particles[i].y+=random(0,2);
+            if(particles[i].direction==5)particles[i].x+=random(-2,0);
+            if(particles[i].direction==6)particles[i].x+=random(-2,0);
+            if(particles[i].direction==6)particles[i].y+=random(-2,0);
+            if(particles[i].direction==7)particles[i].y+=random(-2,0);
+            if(particles[i].direction==8)particles[i].y+=random(-2,0);
+            if(particles[i].direction==8)particles[i].x+=random(0,2);
+
             if(random(1,100)==1)particles[i].on_screen=false;
         }
     }
@@ -273,10 +316,11 @@ void update(){
                     if(asteroids[j].size<1){
                         asteroids[j].on_screen=false;
                         asteroid_killcount++;
+
                     }
                     bullets[i].on_screen=false;
                     play_sample(asteroid_shot,125,125,1000,0);
-                    create_particles(asteroids[j].x+50,asteroids[j].y+50,10);
+                    create_particles(asteroids[j].x+50,asteroids[j].y+50,100,1,0);
 
 
 
@@ -296,6 +340,7 @@ void update(){
     }
 
     rest(1);
+    if(key[KEY_Q])rest(10);
 }
 
 

@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
-				<Option output="build/Angle finder" prefix_auto="1" extension_auto="1" />
+				<Option output="build/Asteroids" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
