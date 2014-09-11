@@ -30,6 +30,8 @@ float angle_allegro;
 int player_x=400;
 int player_y=300;
 
+volatile int close_button_pressed = FALSE;
+
 float angle_x;
 float angle_y;
 float vector_x;
@@ -41,6 +43,32 @@ bool create_bullet;
 int bullet_delay;
 
 int asteroid_killcount;
+
+
+// FPS System
+const int updates_per_second = 100;
+
+int frames_done;
+volatile int game_time = 0;
+volatile int ticks = 0;
+bool updatesEnabled=true;
+
+int fps;
+int old_time;
+
+void ticker(){
+  if( updatesEnabled){
+    ticks++;
+  }
+}
+END_OF_FUNCTION(ticker)
+
+void game_time_ticker(){
+  if( updatesEnabled){
+    game_time++;
+  }
+}
+END_OF_FUNCTION(ticker)
 
 struct particle{
     int x;
@@ -69,6 +97,10 @@ struct bullet{
     bool on_screen=false;
 }bullets[100];
 
+void close_button_handler(void){
+  close_button_pressed = TRUE;
+}
+END_OF_FUNCTION(close_button_handler)
 //A function for collision, used for mouse clicking
 bool collision(int xMin1, int xMax1, int xMin2, int xMax2, int yMin1, int yMax1, int yMin2, int yMax2)
 {
@@ -112,6 +144,8 @@ float find_angle(int x_1, int y_1, int x_2, int y_2){
 
     return atan2(tan_1,tan_2);
 }
+
+
 void create_particles(int x, int y, int amount,int colour,int direction){
     for(int i=0; i<amount;){
         for(int j=0; j<1000; j++){
@@ -144,7 +178,7 @@ void create_particles(int x, int y, int amount,int colour,int direction){
                         particles[j].b=0;
 
                     }
-                }else if(randnum==2){
+                }else if(randnum==3){
                     if(colour==1){
                         particles[j].r=84;
                         particles[j].g=16;
@@ -161,7 +195,7 @@ void create_particles(int x, int y, int amount,int colour,int direction){
 
 
             }
-        if(j==999 && i<amount)i=amount;
+        if(j>999 && i<amount)i=amount;
         }
     }
 
@@ -173,11 +207,12 @@ void draw(){
     if(key[KEY_F1])debugmode=true;
     if(key[KEY_F2])debugmode=false;
     if(debugmode){
-        textprintf_ex(buffer,font,5,5,makecol(0,0,0),-1,"Mouse X:%i",mouse_x);
-        textprintf_ex(buffer,font,5,15,makecol(0,0,0),-1,"Mouse Y:%i",mouse_y);
-        textprintf_ex(buffer,font,5,25,makecol(0,0,0),-1,"Distance to mouse:%4.2f",distance_to_mouse);
-        textprintf_ex(buffer,font,5,35,makecol(0,0,0),-1,"Radians:%4.2f,Degrees%4.2f,Allegro%4.2f",angle_radians,angle_degrees,angle_allegro);
-        textprintf_ex(buffer,font,5,45,makecol(0,0,0),-1,"Vector X:%4.2f,Vector Y:%4.2f",angle_x,angle_y);
+        textprintf_ex(buffer,font,5,45,makecol(255,255,255),-1,"Mouse X:%i",mouse_x);
+        textprintf_ex(buffer,font,5,55,makecol(255,255,255),-1,"Mouse Y:%i",mouse_y);
+        textprintf_ex(buffer,font,5,65,makecol(255,255,255),-1,"Distance to mouse:%4.2f",distance_to_mouse);
+        textprintf_ex(buffer,font,5,75,makecol(255,255,255),-1,"Radians:%4.2f,Degrees%4.2f,Allegro%4.2f",angle_radians,angle_degrees,angle_allegro);
+        textprintf_ex(buffer,font,5,85,makecol(255,255,255),-1,"Vector X:%4.2f,Vector Y:%4.2f",angle_x,angle_y);
+
     }
 
 
@@ -216,7 +251,7 @@ void draw(){
 }
 
 void update(){
-    draw();
+
     //Calls the function, solves the math
     distance_to_mouse=distance_to_object(mouse_x,mouse_y,player_x,player_y);
     angle_radians=find_angle(player_x,player_y,mouse_x,mouse_y);
@@ -339,7 +374,7 @@ void update(){
         }
     }
 
-    rest(1);
+
     if(key[KEY_Q])rest(10);
 }
 
@@ -392,7 +427,17 @@ void setup(){
     if (!(asteroid_shot = load_sample("asteroid_shot.wav"))){
         abort_on_error("Cannot find sample asteroid_shot.wav\nPlease check your files and try again");
     }
+     LOCK_VARIABLE(ticks);
+  LOCK_FUNCTION(ticker);
+  install_int_ex(ticker, BPS_TO_TIMER(updates_per_second));
 
+  LOCK_VARIABLE(game_time);
+  LOCK_FUNCTION(game_time_ticker);
+  install_int_ex(game_time_ticker, BPS_TO_TIMER(10));
+
+  // Close button
+  LOCK_FUNCTION(close_button_handler);
+  set_close_button_callback(close_button_handler);
 
 }
 
@@ -419,10 +464,37 @@ int main(){
   setup();
 
 
-    while(!key[KEY_ESC]){
-        update();
+    while(!key[KEY_ESC] && !close_button_pressed){
+       while(ticks == 0){
+            rest(1);
+        }
+    while(ticks > 0){
+
+      int old_ticks = ticks;
+
+      //Do state logic
+     update();
+
+      // Counter for FPS
+      frames_done++;
+
+      ticks--;
+      if(old_ticks <= ticks){
+        break;
+      }
+    }
+    if(game_time - old_time >= 10){
+      fps = frames_done;
+      frames_done = 0;
+      old_time = game_time;
+    }
+    //Do state rendering
+    draw();
+  }
+
+
   	}
 
-	return 0;
-}
+
+
 END_OF_MAIN()
