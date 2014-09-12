@@ -22,10 +22,15 @@ FONT* f3;
 FONT* f4;
 FONT* f5;
 
+int asteroids_on_screen;
+int asteroids_off_screen;
+
 float distance_to_mouse;
 float angle_radians;
 float angle_degrees;
 float angle_allegro;
+
+int particle_level=1;
 
 int player_x=400;
 int player_y=300;
@@ -147,9 +152,12 @@ float find_angle(int x_1, int y_1, int x_2, int y_2){
 
 
 void create_particles(int x, int y, int amount,int colour,int direction){
-    for(int i=0; i<amount;){
+    if(particle_level==1){
+      for(int i=0; i<amount;){
         for(int j=0; j<1000; j++){
+
             if(!particles[j].on_screen && i<amount){
+                i++;
                 particles[j].on_screen=true;
                 particles[j].x=x;
                 particles[j].y=y;
@@ -191,28 +199,28 @@ void create_particles(int x, int y, int amount,int colour,int direction){
                     }
                 }
 
-                i++;
+
 
 
             }
-        if(j>999 && i<amount)i=amount;
+
         }
     }
-
+  }
 }
 
 void draw(){
  //Draws the screen
     rectfill(buffer,0,0,800,600,makecol(10,0,0));
-    if(key[KEY_F1])debugmode=true;
-    if(key[KEY_F2])debugmode=false;
+
     if(debugmode){
         textprintf_ex(buffer,font,5,45,makecol(255,255,255),-1,"Mouse X:%i",mouse_x);
         textprintf_ex(buffer,font,5,55,makecol(255,255,255),-1,"Mouse Y:%i",mouse_y);
         textprintf_ex(buffer,font,5,65,makecol(255,255,255),-1,"Distance to mouse:%4.2f",distance_to_mouse);
         textprintf_ex(buffer,font,5,75,makecol(255,255,255),-1,"Radians:%4.2f,Degrees%4.2f,Allegro%4.2f",angle_radians,angle_degrees,angle_allegro);
         textprintf_ex(buffer,font,5,85,makecol(255,255,255),-1,"Vector X:%4.2f,Vector Y:%4.2f",angle_x,angle_y);
-
+        textprintf_ex(buffer,font,5,95,makecol(255,255,255),-1,"Particle Level:%i",particle_level);
+        textprintf_ex(buffer,font,5,105,makecol(255,255,255),-1,"Asteroids-On:%i Off:%i",asteroids_on_screen,asteroids_off_screen);
     }
 
 
@@ -266,10 +274,15 @@ void update(){
     //Moves the point
 
 
-
+    if(key[KEY_F1])debugmode=true;
+    if(key[KEY_F2])debugmode=false;
+    if(debugmode){
+        if(key[KEY_F3])particle_level=1;
+        if(key[KEY_F4])particle_level=0;
+    }
 
     bullet_delay++;
-    if(key[KEY_SPACE] && bullet_delay>99 || mouse_b & 1 && bullet_delay>99 ){
+    if(key[KEY_SPACE] && bullet_delay>4 || mouse_b & 1 && bullet_delay>4 ){
         create_bullet=true;
         bullet_delay=0;
         play_sample(fire,125,125,1000,0);
@@ -312,23 +325,27 @@ void update(){
 
 
     //Asteroids code
+    asteroids_on_screen=0;
+    asteroids_off_screen=0;
      for(int i=0; i<100; i++){
         if(asteroids[i].on_screen){
+           asteroids_on_screen++;
            asteroids[i].x+=asteroids[i].vector_x;
            asteroids[i].y+=asteroids[i].vector_y;
 
 
            if(asteroids[i].x>1000 || asteroids[i].y>800 || asteroids[i].x<-200 || asteroids[i].y<-200)asteroids[i].on_screen=false;
-        }else if(random(1,10000)==1){
+        }else if(1>0){
            asteroids[i].size=4;
            asteroids[i].on_screen=true;
-           asteroids[i].x=random(-200,1000);
+           asteroids_on_screen++;
+           asteroids[i].x=random(-100,900);
            asteroids[i].y=-100;
-           asteroids[i].vector_x=(-2*cos(random(-3,3)))/4;
-           asteroids[i].vector_y=(-2*sin(random(-3,3)))/4;
+           asteroids[i].vector_x=(-3*cos(random(-3,3)))/4;
+           asteroids[i].vector_y=(-3*sin(random(-3,3)))/4;
 
 
-        }
+        }else asteroids_off_screen++;
     }
 
     for(int i=0; i<100; i++){
@@ -366,8 +383,8 @@ void update(){
         }else if(create_bullet==true){
             bullets[i].on_screen=true;
             create_bullet=false;
-            bullets[i].vector_x=-3*cos(angle_radians);
-            bullets[i].vector_y=-3*sin(angle_radians);
+            bullets[i].vector_x=-4*cos(angle_radians);
+            bullets[i].vector_y=-4*sin(angle_radians);
             bullets[i].x=player_x;
             bullets[i].y=player_y;
 
@@ -375,7 +392,7 @@ void update(){
     }
 
 
-    if(key[KEY_Q])rest(10);
+
 }
 
 
